@@ -222,6 +222,9 @@ impl super::Validator {
                 if width == 8 {
                     self.require_type_capability(Capabilities::FLOAT64)?;
                     true
+                } else if width == 2 {
+                    self.require_type_capability(Capabilities::FLOAT16)?;
+                    true
                 } else {
                     width == 4
                 }

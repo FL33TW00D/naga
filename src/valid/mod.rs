@@ -113,6 +113,8 @@ bitflags::bitflags! {
         const MULTISAMPLED_SHADING = 0x800;
         /// Support for ray queries and acceleration structures.
         const RAY_QUERY = 0x1000;
+        /// Float values with width = 2.
+        const FLOAT16 = 0x2000;
     }
 }
 

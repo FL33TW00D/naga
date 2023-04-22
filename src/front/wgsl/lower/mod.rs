@@ -1211,6 +1211,10 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
         let (expr, is_reference) = match *expr {
             ast::Expression::Literal(literal) => {
                 let inner = match literal {
+                    ast::Literal::Number(Number::F16(f)) => crate::ConstantInner::Scalar {
+                        width: 2,
+                        value: crate::ScalarValue::Float(f.to_f64()),
+                    },
                     ast::Literal::Number(Number::F32(f)) => crate::ConstantInner::Scalar {
                         width: 4,
                         value: crate::ScalarValue::Float(f as _),
@@ -2329,6 +2333,10 @@ impl<'source, 'temp> Lowerer<'source, 'temp> {
         let span = ctx.ast_expressions.get_span(expr);
         let inner = match ctx.ast_expressions[expr] {
             ast::Expression::Literal(literal) => match literal {
+                ast::Literal::Number(Number::F16(f)) => crate::ConstantInner::Scalar {
+                    width: 2,
+                    value: crate::ScalarValue::Float(f.to_f64()),
+                },
                 ast::Literal::Number(Number::F32(f)) => crate::ConstantInner::Scalar {
                     width: 4,
                     value: crate::ScalarValue::Float(f as _),

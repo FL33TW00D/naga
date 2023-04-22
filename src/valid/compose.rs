@@ -29,6 +29,8 @@ pub fn validate_compose(
     match type_arena[self_ty_handle].inner {
         // vectors are composed from scalars or other vectors
         Ti::Vector { size, kind, width } => {
+            log::error!("Validating vector compose");
+            log::error!("size: {:?}, kind: {:?}, width: {:?}", size, kind, width);
             let mut total = 0;
             for (index, comp_res) in component_resolutions.enumerate() {
                 total += match *comp_res.inner_with(type_arena) {

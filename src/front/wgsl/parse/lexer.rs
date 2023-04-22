@@ -490,9 +490,9 @@ fn test_numbers() {
             Token::Number(Ok(Number::F32(43.75))),
             Token::Number(Ok(Number::F32(16.))),
             Token::Number(Ok(Number::F32(0.1875))),
-            Token::Number(Err(NumberError::UnimplementedF16)),
+            Token::Number(Err(NumberError::NotRepresentable)),
             Token::Number(Ok(Number::F32(0.12109375))),
-            Token::Number(Err(NumberError::UnimplementedF16)),
+            Token::Number(Err(NumberError::NotRepresentable)),
         ],
     );
 

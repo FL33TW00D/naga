@@ -425,157 +425,58 @@ fn convert_wgsl() {
     let _ = env_logger::try_init();
 
     let root = env!("CARGO_MANIFEST_DIR");
+    #[rustfmt::skip]
     let inputs = [
-        (
-            "array-in-ctor",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "empty",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "quad",
-            Targets::SPIRV
-                | Targets::METAL
-                | Targets::GLSL
-                | Targets::DOT
-                | Targets::HLSL
-                | Targets::WGSL,
-        ),
-        (
-            "bits",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::WGSL,
-        ),
-        (
-            "bitcast",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "boids",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "skybox",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "collatz",
-            Targets::SPIRV
-                | Targets::METAL
-                | Targets::IR
-                | Targets::ANALYSIS
-                | Targets::HLSL
-                | Targets::WGSL,
-        ),
-        (
-            "shadow",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "image",
-            Targets::SPIRV | Targets::METAL | Targets::HLSL | Targets::WGSL | Targets::GLSL,
-        ),
-        ("extra", Targets::SPIRV | Targets::METAL | Targets::WGSL),
-        ("push-constants", Targets::GLSL | Targets::HLSL),
-        (
-            "operators",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "functions",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "fragment-output",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        ("functions-webgl", Targets::GLSL),
-        (
-            "interpolate",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "access",
-            Targets::SPIRV
-                | Targets::METAL
-                | Targets::GLSL
-                | Targets::HLSL
-                | Targets::WGSL
-                | Targets::IR
-                | Targets::ANALYSIS,
-        ),
-        (
-            "atomicOps",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
+        ("access", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL | Targets::IR | Targets::ANALYSIS),
+        ("array-in-ctor", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
         ("atomicCompareExchange", Targets::SPIRV | Targets::WGSL),
-        (
-            "padding",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        ("pointers", Targets::SPIRV | Targets::WGSL),
-        (
-            "control-flow",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "standard",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        //TODO: GLSL https://github.com/gfx-rs/naga/issues/874
-        (
-            "interface",
-            Targets::SPIRV | Targets::METAL | Targets::HLSL | Targets::WGSL,
-        ),
-        (
-            "globals",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
+        ("atomicOps", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("binding-arrays", Targets::WGSL | Targets::HLSL | Targets::METAL | Targets::SPIRV),
+        ("bitcast", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("bits", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::WGSL),
+        ("boids", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("bounds-check-image-restrict", Targets::SPIRV | Targets::METAL | Targets::GLSL),
+        ("bounds-check-image-rzsw", Targets::SPIRV | Targets::METAL | Targets::GLSL),
+        ("bounds-check-restrict", Targets::SPIRV | Targets::METAL),
         ("bounds-check-zero", Targets::SPIRV | Targets::METAL),
         ("bounds-check-zero-atomic", Targets::METAL),
-        ("bounds-check-restrict", Targets::SPIRV | Targets::METAL),
-        (
-            "bounds-check-image-restrict",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL,
-        ),
-        (
-            "bounds-check-image-rzsw",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL,
-        ),
-        ("policy-mix", Targets::SPIRV | Targets::METAL),
-        (
-            "texture-arg",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
+        ("break-if", Targets::WGSL | Targets::GLSL | Targets::SPIRV | Targets::HLSL | Targets::METAL),
+        ("collatz", Targets::SPIRV | Targets::METAL | Targets::IR | Targets::ANALYSIS | Targets::HLSL | Targets::WGSL),
+        ("control-flow", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
         ("cubeArrayShadow", Targets::GLSL),
-        (
-            "math-functions",
-            Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL,
-        ),
-        ("cubeArrayShadow", Targets::GLSL),
-        (
-            "binding-arrays",
-            Targets::WGSL | Targets::HLSL | Targets::METAL | Targets::SPIRV,
-        ),
-        ("resource-binding-map", Targets::METAL),
+        ("empty", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("extra", Targets::SPIRV | Targets::METAL | Targets::WGSL),
+        ("force_point_size_vertex_shader_webgl", Targets::GLSL),
+        ("fragment-output", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("functions", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("functions-webgl", Targets::GLSL),
+        ("globals", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("image", Targets::SPIRV | Targets::METAL | Targets::HLSL | Targets::WGSL | Targets::GLSL),
+        ("invariant", Targets::GLSL),
+        ("interpolate", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("interface", Targets::SPIRV | Targets::METAL | Targets::HLSL | Targets::WGSL),
+        ("lexical-scopes", Targets::WGSL),
+        ("math-functions", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("matmul-f16-debug", Targets::METAL),
+        ("matmul-f16", Targets::METAL),
+        ("module-scope", Targets::WGSL),
         ("multiview", Targets::SPIRV | Targets::GLSL | Targets::WGSL),
         ("multiview_webgl", Targets::GLSL),
-        (
-            "break-if",
-            Targets::WGSL | Targets::GLSL | Targets::SPIRV | Targets::HLSL | Targets::METAL,
-        ),
-        ("lexical-scopes", Targets::WGSL),
-        ("type-alias", Targets::WGSL),
-        ("module-scope", Targets::WGSL),
-        (
-            "workgroup-var-init",
-            Targets::WGSL | Targets::GLSL | Targets::SPIRV | Targets::HLSL | Targets::METAL,
-        ),
-        ("sprite", Targets::SPIRV),
-        ("force_point_size_vertex_shader_webgl", Targets::GLSL),
-        ("invariant", Targets::GLSL),
+        ("operators", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("padding", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("pointers", Targets::SPIRV | Targets::WGSL),
+        ("policy-mix", Targets::SPIRV | Targets::METAL),
+        ("push-constants", Targets::GLSL | Targets::HLSL),
+        ("quad", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::DOT | Targets::HLSL | Targets::WGSL),
         ("ray-query", Targets::SPIRV | Targets::METAL),
+        ("resource-binding-map", Targets::METAL),
+        ("shadow", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("skybox", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("sprite", Targets::SPIRV),
+        ("standard", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("texture-arg", Targets::SPIRV | Targets::METAL | Targets::GLSL | Targets::HLSL | Targets::WGSL),
+        ("type-alias", Targets::WGSL),
+        ("workgroup-var-init", Targets::WGSL | Targets::GLSL | Targets::SPIRV | Targets::HLSL | Targets::METAL),
     ];
 
     for &(name, targets) in inputs.iter() {

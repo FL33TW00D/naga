@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use half::f16;
+
 use crate::front::wgsl::error::NumberError;
 use crate::front::wgsl::parse::lexer::Token;
 
@@ -16,6 +18,8 @@ pub enum Number {
     U32(u32),
     /// Concrete f32
     F32(f32),
+    /// Concrete f16
+    F16(f16),
 }
 
 impl Number {
@@ -387,7 +391,7 @@ fn parse_hex_float(input: &str, kind: Option<FloatKind>) -> Result<Number, Numbe
             // can only be ParseHexfErrorKind::Inexact but we can't check since it's private
             _ => Err(NumberError::NotRepresentable),
         },
-        Some(FloatKind::F16) => Err(NumberError::UnimplementedF16),
+        Some(FloatKind::F16) => Err(NumberError::NotRepresentable),
     }
 }
 
@@ -407,7 +411,12 @@ fn parse_dec_float(input: &str, kind: Option<FloatKind>) -> Result<Number, Numbe
                 .then_some(Number::F32(num))
                 .ok_or(NumberError::NotRepresentable)
         }
-        Some(FloatKind::F16) => Err(NumberError::UnimplementedF16),
+        Some(FloatKind::F16) => {
+            let num = input.parse::<f32>().unwrap(); // will never fail
+            num.is_finite()
+                .then_some(Number::F16(f16::from_f32(num)))
+                .ok_or(NumberError::NotRepresentable)
+        }
     }
 }
 

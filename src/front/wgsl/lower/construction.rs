@@ -97,6 +97,7 @@ impl<'a> ComponentsHandle<'a> {
     }
 }
 
+#[derive(Debug)]
 enum Components<'a> {
     None,
     One {

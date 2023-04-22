@@ -103,7 +103,7 @@ pub fn map_storage_format(word: &str, span: Span) -> Result<crate::StorageFormat
 
 pub fn get_scalar_type(word: &str) -> Option<(crate::ScalarKind, crate::Bytes)> {
     match word {
-        // "f16" => Some((crate::ScalarKind::Float, 2)),
+        "f16" => Some((crate::ScalarKind::Float, 2)),
         "f32" => Some((crate::ScalarKind::Float, 4)),
         "f64" => Some((crate::ScalarKind::Float, 8)),
         "i32" => Some((crate::ScalarKind::Sint, 4)),
