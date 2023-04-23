@@ -621,9 +621,6 @@ impl Parser {
             }
             (Token::Number(res), span) => {
                 let _ = lexer.next();
-                println!("Could we attach info here: {:?}", res);
-                println!("Could we attach info here: {:?}", span);
-                println!("Could we attach info here: {:?}", ctx);
                 let num = res.map_err(|err| Error::BadNumber(span, err))?;
                 ast::Expression::Literal(ast::Literal::Number(num))
             }
@@ -645,25 +642,7 @@ impl Parser {
 
                 if let Some(ty) = self.constructor_type(lexer, word, span, ctx.reborrow())? {
                     let ty_span = lexer.span_from(start);
-                    let mut components = self.arguments(lexer, ctx.reborrow())?;
-
-                    match ty {
-                        ast::ConstructorType::Vector { kind, width, .. } => {
-                            components.iter_mut().for_each(|c| {
-                                let x = ctx.expressions.get_mut(*c);
-                                match x {
-                                    ast::Expression::Literal(num) => match num {
-                                        ast::Literal::Number(mut n) => {
-                                            n.abstract_to_concrete(kind, width).unwrap();
-                                        }
-                                        _ => {}
-                                    },
-                                    _ => {}
-                                }
-                            })
-                        }
-                        _ => {}
-                    }
+                    let components = self.arguments(lexer, ctx.reborrow())?;
 
                     ast::Expression::Construct {
                         ty,

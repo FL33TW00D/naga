@@ -22,74 +22,10 @@ pub enum Number {
     F16(f16),
 }
 
-impl Number {
-    /*
-    fn abstract_to_concrete(self, width: crate::Bytes) -> Result<Number, NumberError> {
-        match self {
-            Number::AbstractInt(num) => i32::try_from(num)
-                .map(Number::I32)
-                .map_err(|_| NumberError::NotRepresentable),
-            Number::AbstractFloat(num) => {
-                let num = num as f32;
-                if num.is_finite() {
-                    Ok(Number::F32(num))
-                } else {
-                    Err(NumberError::NotRepresentable)
-                }
-            }
-            num => Ok(num),
-        }
-    }*/
-
-    /// Convert abstract numbers to a plausible concrete counterpart.
-    ///
-    /// Return concrete numbers unchanged. If the conversion would be
-    /// lossy, return an error.
-    pub fn abstract_to_concrete(
-        self,
-        kind: crate::ScalarKind,
-        width: crate::Bytes,
-    ) -> Result<Number, NumberError> {
-        match self {
-            Number::AbstractInt(num) => match (width, kind) {
-                (4, crate::ScalarKind::Sint) => i32::try_from(num)
-                    .map(Number::I32)
-                    .map_err(|_| NumberError::NotRepresentable),
-                (4, crate::ScalarKind::Uint) => u32::try_from(num)
-                    .map(Number::U32)
-                    .map_err(|_| NumberError::NotRepresentable),
-                _ => Err(NumberError::NotRepresentable),
-            },
-            Number::AbstractFloat(num) => match (width, kind) {
-                (2, crate::ScalarKind::Float) => {
-                    let num = f16::from_f64(num);
-                    if num.is_finite() {
-                        Ok(Number::F16(num))
-                    } else {
-                        Err(NumberError::NotRepresentable)
-                    }
-                }
-                (4, crate::ScalarKind::Float) => {
-                    let num = num as f32;
-                    if num.is_finite() {
-                        Ok(Number::F32(num))
-                    } else {
-                        Err(NumberError::NotRepresentable)
-                    }
-                }
-                _ => Err(NumberError::NotRepresentable),
-            },
-            num => Ok(num),
-        }
-    }
-}
-
 // TODO: when implementing Creation-Time Expressions, remove the ability to match the minus sign
 
 pub(in crate::front::wgsl) fn consume_number(input: &str) -> (Token<'_>, &str) {
-    println!("consume_number: {:?}", input);
     let (result, rest) = parse(input);
-    println!("result: {:?}, rest: {:?}", result, rest);
     (Token::Number(result), rest)
 }
 
@@ -131,7 +67,6 @@ enum FloatKind {
 // -?(?:0[xX](?:([0-9a-fA-F]+\.[0-9a-fA-F]*|[0-9a-fA-F]*\.[0-9a-fA-F]+)(?:([pP][+-]?[0-9]+)([fh]?))?|([0-9a-fA-F]+)([pP][+-]?[0-9]+)([fh]?)|([0-9a-fA-F]+)([iu]?))|((?:[0-9]+[eE][+-]?[0-9]+|(?:[0-9]+\.[0-9]*|[0-9]*\.[0-9]+)(?:[eE][+-]?[0-9]+)?))([fh]?)|((?:[0-9]|[1-9][0-9]+))([iufh]?))
 
 fn parse(input: &str) -> (Result<Number, NumberError>, &str) {
-    println!("Parsing number: {:?}", input);
     /// returns `true` and consumes `X` bytes from the given byte buffer
     /// if the given `X` nr of patterns are found at the start of the buffer
     macro_rules! consume {
