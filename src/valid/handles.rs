@@ -188,7 +188,6 @@ impl super::Validator {
         };
 
         for entry_point in entry_points.iter() {
-            log::error!("Entry point: {:#?}", entry_point);
             validate_function(None, &entry_point.function)?;
         }
 

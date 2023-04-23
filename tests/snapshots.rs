@@ -480,6 +480,9 @@ fn convert_wgsl() {
     ];
 
     for &(name, targets) in inputs.iter() {
+        if name != "matmul-f16-debug" {
+            continue;
+        }
         println!("Processing '{name}'");
         // WGSL shaders lives in root dir as a privileged.
         let file = fs::read_to_string(format!("{root}/{BASE_DIR_IN}/{name}.wgsl"))

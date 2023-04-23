@@ -1,3 +1,5 @@
+use half::f16;
+
 use super::{number::consume_number, Error, ExpectedToken};
 use crate::front::wgsl::error::NumberError;
 use crate::front::wgsl::parse::{conv, Number};
@@ -485,7 +487,7 @@ fn test_numbers() {
             Token::Number(Ok(Number::F32(0.01))),
             Token::Number(Ok(Number::F32(12.34))),
             Token::Number(Ok(Number::F32(0.))),
-            Token::Number(Err(NumberError::UnimplementedF16)),
+            Token::Number(Ok(Number::F16(f16::from_f32(0.)))),
             Token::Number(Ok(Number::F32(0.001))),
             Token::Number(Ok(Number::F32(43.75))),
             Token::Number(Ok(Number::F32(16.))),

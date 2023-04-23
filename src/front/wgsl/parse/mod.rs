@@ -12,6 +12,7 @@ pub mod number;
 /// State for constructing an AST expression.
 ///
 /// Not to be confused with `lower::ExpressionContext`.
+#[derive(Debug)]
 struct ExpressionContext<'input, 'temp, 'out> {
     /// The [`TranslationUnit::expressions`] arena to which we should contribute
     /// expressions.
@@ -224,7 +225,7 @@ impl Parser {
     /// This is for attributes like `size`, `location` and others.
     fn non_negative_i32_literal<'a>(lexer: &mut Lexer<'a>) -> Result<u32, Error<'a>> {
         match lexer.next() {
-            (Token::Number(Ok(Number::I32(num))), span) => {
+            (Token::Number(Ok(Number::AbstractInt(num))), span) => {
                 u32::try_from(num).map_err(|_| Error::NegativeInt(span))
             }
             (Token::Number(Err(e)), span) => Err(Error::BadNumber(span, e)),
@@ -237,7 +238,7 @@ impl Parser {
     /// Note: these values should be no larger than [`i32::MAX`], but this is not checked here.
     fn generic_non_negative_int_literal<'a>(lexer: &mut Lexer<'a>) -> Result<u32, Error<'a>> {
         match lexer.next() {
-            (Token::Number(Ok(Number::I32(num))), span) => {
+            (Token::Number(Ok(Number::AbstractInt(num))), span) => {
                 u32::try_from(num).map_err(|_| Error::NegativeInt(span))
             }
             (Token::Number(Ok(Number::U32(num))), _) => Ok(num),
@@ -471,6 +472,7 @@ impl Parser {
         match (lexer.peek().0, partial) {
             (Token::Paren('<'), ast::ConstructorType::PartialVector { size }) => {
                 let (kind, width) = lexer.next_scalar_generic()?;
+                println!("kind: {:?}, width: {:?}", kind, width);
                 Ok(Some(ast::ConstructorType::Vector { size, kind, width }))
             }
             (Token::Paren('<'), ast::ConstructorType::PartialMatrix { columns, rows }) => {
@@ -619,6 +621,9 @@ impl Parser {
             }
             (Token::Number(res), span) => {
                 let _ = lexer.next();
+                println!("Could we attach info here: {:?}", res);
+                println!("Could we attach info here: {:?}", span);
+                println!("Could we attach info here: {:?}", ctx);
                 let num = res.map_err(|err| Error::BadNumber(span, err))?;
                 ast::Expression::Literal(ast::Literal::Number(num))
             }
@@ -640,7 +645,26 @@ impl Parser {
 
                 if let Some(ty) = self.constructor_type(lexer, word, span, ctx.reborrow())? {
                     let ty_span = lexer.span_from(start);
-                    let components = self.arguments(lexer, ctx.reborrow())?;
+                    let mut components = self.arguments(lexer, ctx.reborrow())?;
+
+                    match ty {
+                        ast::ConstructorType::Vector { kind, width, .. } => {
+                            components.iter_mut().for_each(|c| {
+                                let x = ctx.expressions.get_mut(*c);
+                                match x {
+                                    ast::Expression::Literal(num) => match num {
+                                        ast::Literal::Number(mut n) => {
+                                            n.abstract_to_concrete(kind, width).unwrap();
+                                        }
+                                        _ => {}
+                                    },
+                                    _ => {}
+                                }
+                            })
+                        }
+                        _ => {}
+                    }
+
                     ast::Expression::Construct {
                         ty,
                         ty_span,
@@ -2292,6 +2316,8 @@ impl Parser {
                 }
             }
         }
+        println!("Parsed successfully");
+        println!("{:#?}", tu);
 
         Ok(tu)
     }
